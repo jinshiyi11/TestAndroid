@@ -1,9 +1,9 @@
 package com.shuai.test.layout;
 
-import com.shuai.test.broadcast.R;
-
 import android.app.Activity;
 import android.os.Bundle;
+
+import com.shuai.test.R;
 
 public class TestLayoutActivity extends Activity {
 

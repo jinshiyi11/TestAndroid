@@ -1,5 +1,7 @@
 package com.shuai.test.broadcast;
 
+import com.shuai.test.R;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;

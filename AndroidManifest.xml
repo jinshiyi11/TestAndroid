@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.shuai.test.broadcast"
+    package="com.shuai.test"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -17,9 +17,17 @@
         <activity
             android:name=".TestBroadcastActivity"
             android:label="@string/app_name" >
-            
         </activity>
-        <activity android:name="com.shuai.test.layout.TestLayoutActivity">
+        <activity android:name="com.shuai.test.layout.TestLayoutActivity" >
+            <!-- <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter> -->
+        </activity>
+        <activity
+            android:name="com.shuai.test.touchevent.TestTouchActivity"
+            android:label="@string/title_activity_test_touch" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

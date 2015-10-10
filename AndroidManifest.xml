@@ -7,10 +7,12 @@
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="19" />
+    
+    <uses-permission android:name="android.permission.GET_TASKS"/>
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
-        android:debuggable="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -19,21 +21,33 @@
             android:label="@string/app_name" >
         </activity>
         <activity android:name="com.shuai.test.layout.TestLayoutActivity" >
-            <!-- <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter> -->
         </activity>
         <activity
             android:name="com.shuai.test.touchevent.TestTouchActivity"
             android:label="@string/title_activity_test_touch" >
+        </activity>
+        <activity
+            android:name="com.shuai.test.dialog.TestDialogActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".tools.TopActivityMonitorService"></service>
+        <service
+        android:label="WindowChangeDetectingService"
+        android:name="com.shuai.test.tools.WindowChangeDetectingService"
+        android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+        <intent-filter>
+            <action android:name="android.accessibilityservice.AccessibilityService"/>
+        </intent-filter>
+        <meta-data
+            android:name="android.accessibilityservice"
+            android:resource="@xml/accessibilityservice"/>
+    </service>
+        
+        
     </application>
 
 </manifest>

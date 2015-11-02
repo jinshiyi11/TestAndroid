@@ -28,11 +28,16 @@
         </activity>
         <activity
             android:name="com.shuai.test.dialog.TestDialogActivity" >
+            
+        </activity>
+        <activity android:name="com.shuai.test.launchmode.LauchModeNormalActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name="com.shuai.test.launchmode.LauchModeSingleTaskActivity" >
         </activity>
         <service android:name=".tools.TopActivityMonitorService"></service>
         <service

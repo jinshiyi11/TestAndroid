@@ -6,7 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.GpsStatus;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -25,31 +29,39 @@ import android.widget.Toast;
 import com.shuai.test.R;
 import com.shuai.test.util.ResourcesUtil;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
-public class TestLocationActivity extends Activity {
-    private static final String TAG = TestLocationService.class.getSimpleName();
+public class TestLocationActivity extends Activity implements LocationListener {
+    private static final String TAG = TestLocationActivity.class.getSimpleName();
 
-    Button btnGPSShowLocation;
-    Button btnNWShowLocation;
-    Button mBtnGetCellInfo;
+    private Context mContext;
+    private Button btnGPSShowLocation;
+    private Button btnNWShowLocation;
+    private Button mBtnGetCellInfo;
+    private Button mBtnGeoCoder;
 
-    TestLocationService appLocationService;
+    private LocationManager mLocationManager;
+    private Geocoder mGeocoder;
+
+    private static final long MIN_DISTANCE_FOR_UPDATE = 10;
+    private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_location);
-        appLocationService = new TestLocationService(
-                TestLocationActivity.this);
+        mContext=this;
+        mLocationManager= (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mGeocoder=new Geocoder(this, Locale.getDefault());
 
         btnGPSShowLocation = (Button) findViewById(R.id.btnGPSShowLocation);
         btnGPSShowLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
 
-                Location gpsLocation = appLocationService
-                        .getLocation(LocationManager.GPS_PROVIDER);
+                Location gpsLocation = getLocation(LocationManager.GPS_PROVIDER);
 
                 if (gpsLocation != null) {
                     double latitude = gpsLocation.getLatitude();
@@ -83,8 +95,7 @@ public class TestLocationActivity extends Activity {
                 Log.d(TAG, "networkLocationProviderPackageName:" + networkLocationProviderPackageName);
                 Log.d(TAG, "locationProviderPackageNames:" + locationProviderPackageNames);
 
-                Location nwLocation = appLocationService
-                        .getLocation(LocationManager.NETWORK_PROVIDER);
+                Location nwLocation = getLocation(LocationManager.NETWORK_PROVIDER);
 
                 if (nwLocation != null) {
                     double latitude = nwLocation.getLatitude();
@@ -108,6 +119,46 @@ public class TestLocationActivity extends Activity {
                 getCellLocationInfo();
             }
         });
+
+        mBtnGeoCoder= (Button) findViewById(R.id.btn_geocoder);
+        mBtnGeoCoder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Geocoder.isPresent()){
+                    Log.d(TAG,"Geocoder is present!");
+                }else{
+                    Log.e(TAG,"Geocoder is not present!");
+                    Toast.makeText(mContext,"Geocoder is not present!",Toast.LENGTH_LONG).show();
+
+                }
+                onGeoCoder();
+            }
+        });
+
+        mLocationManager.addNmeaListener(new GpsStatus.NmeaListener() {
+            @Override
+            public void onNmeaReceived(long timestamp, String nmea) {
+                Log.d(TAG,"onNmeaReceived,timestamp:"+timestamp+",nmea:"+nmea);
+
+            }
+        });
+
+    }
+
+    private void onGeoCoder() {
+        Thread t=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    List<Address> addressList = mGeocoder.getFromLocationName("天安门", 8);
+                    Log.d(TAG,""+addressList);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        t.start();
 
     }
 
@@ -143,6 +194,20 @@ public class TestLocationActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    public Location getLocation(String provider) {
+        Location location=null;
+        if (mLocationManager.isProviderEnabled(provider)) {
+            mLocationManager.requestLocationUpdates(provider,
+                    MIN_TIME_FOR_UPDATE, MIN_DISTANCE_FOR_UPDATE, this);
+            if (mLocationManager != null) {
+                location = mLocationManager.getLastKnownLocation(provider);
+
+                return location;
+            }
+        }
+        return null;
     }
 
     /**
@@ -187,6 +252,26 @@ public class TestLocationActivity extends Activity {
             //info.getCid();// 取出当前邻区的CID
             System.out.println("rssi:" + info.getRssi() + "   strength:" + strength);
         }
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
 
     }
 }

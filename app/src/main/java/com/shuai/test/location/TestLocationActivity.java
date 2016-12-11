@@ -2,9 +2,11 @@ package com.shuai.test.location;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
@@ -12,10 +14,13 @@ import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.CellLocation;
 import android.telephony.NeighboringCellInfo;
+import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
@@ -41,8 +46,12 @@ public class TestLocationActivity extends Activity implements LocationListener {
     private Button btnNWShowLocation;
     private Button mBtnGetCellInfo;
     private Button mBtnGeoCoder;
+    private Button mBtnScanWifi;
 
     private LocationManager mLocationManager;
+    private TelephonyManager mTelePhonyManager;
+    private WifiManager mWifiManager;
+    private MyPhoneStateListener mPhoneStateListener;
     private Geocoder mGeocoder;
 
     private static final long MIN_DISTANCE_FOR_UPDATE = 10;
@@ -54,7 +63,20 @@ public class TestLocationActivity extends Activity implements LocationListener {
         setContentView(R.layout.activity_test_location);
         mContext=this;
         mLocationManager= (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mTelePhonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        mWifiManager= (WifiManager) getSystemService(Context.WIFI_SERVICE);
         mGeocoder=new Geocoder(this, Locale.getDefault());
+        mPhoneStateListener=new MyPhoneStateListener();
+
+        mTelePhonyManager.listen(mPhoneStateListener,
+                PhoneStateListener.LISTEN_CALL_STATE|
+                        PhoneStateListener.LISTEN_DATA_CONNECTION_STATE|
+                        PhoneStateListener.LISTEN_CELL_INFO|
+                        PhoneStateListener.LISTEN_SIGNAL_STRENGTHS
+        );
+
+        String test=null;
+        Log.d(TAG,"onCreate"+test);
 
         btnGPSShowLocation = (Button) findViewById(R.id.btnGPSShowLocation);
         btnGPSShowLocation.setOnClickListener(new View.OnClickListener() {
@@ -135,6 +157,33 @@ public class TestLocationActivity extends Activity implements LocationListener {
             }
         });
 
+        mBtnScanWifi= (Button) findViewById(R.id.btn_scan_wifi);
+        mBtnScanWifi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onScanWifi();
+            }
+        });
+
+        IntentFilter filter=new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(!intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
+                    throw new IllegalStateException();
+
+                Log.d(TAG,"onReceive wifi scan result");
+                List<ScanResult> scanResults = mWifiManager.getScanResults();
+                if(scanResults!=null){
+                    for(ScanResult item:scanResults){
+                        Log.d(TAG,item.toString());
+                    }
+                }
+
+            }
+        },filter);
+
+
         mLocationManager.addNmeaListener(new GpsStatus.NmeaListener() {
             @Override
             public void onNmeaReceived(long timestamp, String nmea) {
@@ -214,10 +263,7 @@ public class TestLocationActivity extends Activity implements LocationListener {
      * 获取手机基站信息
      */
     private void getCellLocationInfo() {
-
-        TelephonyManager manager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
-        String operator = manager.getNetworkOperator();
+        String operator = mTelePhonyManager.getNetworkOperator();
         if(!TextUtils.isEmpty(operator)) {
             /**通过operator获取 MCC 和MNC */
             int mcc = Integer.parseInt(operator.substring(0, 3));
@@ -226,7 +272,7 @@ public class TestLocationActivity extends Activity implements LocationListener {
             Log.e(TAG,"can not getNetworkOperator");
         }
 
-        CellLocation location = manager.getCellLocation();
+        CellLocation location = mTelePhonyManager.getCellLocation();
         if (location != null) {
             if (location instanceof GsmCellLocation) {
                 GsmCellLocation gsmCellLocation = (GsmCellLocation) location;
@@ -244,7 +290,7 @@ public class TestLocationActivity extends Activity implements LocationListener {
 
         int strength = 0;
         /**通过getNeighboringCellInfo获取BSSS */
-        List<NeighboringCellInfo> infoLists = manager.getNeighboringCellInfo();
+        List<NeighboringCellInfo> infoLists = mTelePhonyManager.getNeighboringCellInfo();
         System.out.println("infoLists:" + infoLists + "     size:" + infoLists.size());
         for (NeighboringCellInfo info : infoLists) {
             strength += (-133 + 2 * info.getRssi());// 获取邻区基站信号强度
@@ -253,6 +299,10 @@ public class TestLocationActivity extends Activity implements LocationListener {
             System.out.println("rssi:" + info.getRssi() + "   strength:" + strength);
         }
 
+    }
+
+    private void onScanWifi(){
+        mWifiManager.startScan();
     }
 
     @Override

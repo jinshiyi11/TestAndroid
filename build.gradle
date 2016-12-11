@@ -13,3 +13,17 @@ allprojects {
         jcenter()
     }
 }
+
+task hehe{
+    println "in hehe"
+}
+
+hehe.doFirst {
+    print "hehe doFirst!\n"
+}
+
+hehe.doLast{
+    print "hehe doLast!\n"
+}
+
+hehe<<{ println "do what you like\n" }

@@ -6,5 +6,6 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_test_touch">TestTouchActivity</string>
     <string name="accessibility_service_description">accessibility_service_description</string>
+    <string name="title_activity_test_life_cycle">TestLifeCycleActivity</string>
 
 </resources>

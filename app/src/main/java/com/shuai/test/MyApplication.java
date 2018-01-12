@@ -7,6 +7,7 @@ import android.os.Debug;
 import com.shuai.test.tools.TopActivityMonitorService;
 
 public class MyApplication extends Application {
+	private static final String TAG=MyApplication.class.getSimpleName();
 
 	public MyApplication() {
 		super();
@@ -16,6 +17,7 @@ public class MyApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
 		
 //		Intent intent=new Intent(this, TopActivityMonitorService.class);
 //		startService(intent);

@@ -11,7 +11,6 @@ public class MyApplication extends Application {
 
 	public MyApplication() {
 		super();
-        Debug.waitForDebugger();
 	}
 
 	@Override

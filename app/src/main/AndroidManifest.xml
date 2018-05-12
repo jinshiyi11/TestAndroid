@@ -18,8 +18,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
             android:name=".MyApplication"
@@ -38,14 +37,10 @@
         </activity>
         <activity
                 android:name=".touchevent.TestTouchActivity"
-                android:label="@string/title_activity_test_touch">
-        </activity>
-        <activity android:name=".dialog.TestDialogActivity">
-        </activity>
-        <activity android:name=".launchmode.LauchModeNormalActivity">
-        </activity>
-        <activity android:name=".launchmode.LauchModeSingleTaskActivity">
-        </activity>
+            android:label="@string/title_activity_test_touch" />
+        <activity android:name=".dialog.TestDialogActivity" />
+        <activity android:name=".launchmode.LauchModeNormalActivity" />
+        <activity android:name=".launchmode.LauchModeSingleTaskActivity" />
 
         <service android:name=".tools.TopActivityMonitorService"/>
         <service
@@ -63,11 +58,18 @@
         <service
                 android:name=".service.TestService"
                 android:enabled="true"
-                android:exported="true">
-        </service>
+            android:exported="true" />
 
-        <activity android:name=".service.TestServiceActivity">
+        <activity android:name=".service.TestServiceActivity" />
+        <activity android:name=".rxjava.TestRxJavaActivity"></activity>
+        <activity android:name=".activity.TestScrollViewActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+        <activity android:name=".animation.TestAnimationActivity"></activity>
 
         <activity android:name=".recyclerview.TestRecyclerViewActivity">
             <intent-filter>

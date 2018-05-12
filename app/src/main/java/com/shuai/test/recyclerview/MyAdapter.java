@@ -74,6 +74,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 remove(position);
+                try {
+                    Thread.sleep(8000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

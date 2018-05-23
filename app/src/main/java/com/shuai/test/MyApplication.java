@@ -13,9 +13,9 @@ public class MyApplication extends Application {
     private static final String TAG = MyApplication.class.getSimpleName();
     private static RefWatcher mRefWatcher;
 
-    public MyApplication() {
-        super();
-    }
+	public MyApplication() {
+		super();
+	//Debug.waitForDebugger();}
 
     public static RefWatcher getRefWatcher() {
         return mRefWatcher;

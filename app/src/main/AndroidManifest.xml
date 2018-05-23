@@ -53,19 +53,24 @@
         </service>
         <service
             android:name=".service.TestService"
+            android:process=":test"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".service.TestServiceActivity" />
-        <activity android:name=".rxjava.TestRxJavaActivity"></activity>
-        <activity android:name=".activity.TestScrollViewActivity">
+        <activity android:name=".service.TestServiceActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".animation.TestAnimationActivity"></activity>
+        <activity android:name=".rxjava.TestRxJavaActivity" />
+        <activity android:name=".activity.TestScrollViewActivity">
+        </activity>
+        <activity android:name=".animation.TestAnimationActivity" />
+        <activity android:name=".reflect.TestReflectActivity">
+
+        </activity>
     </application>
 
 </manifest>

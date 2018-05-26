@@ -73,6 +73,8 @@ public class TestServiceActivity extends Activity implements View.OnClickListene
                         Log.d(TAG,"onServiceDisconnected finish");
                     }
                 }, Context.BIND_AUTO_CREATE);
+                Intent intent2=new Intent(this,TestService.class);
+                startService(intent2);
                 break;
         }
     }

@@ -32,19 +32,19 @@ public class TestService extends Service {
 
         @Override
         public String testStrictPolicy() throws RemoteException {
-            try {
-                URL url = new URL("http://www.baidu.com");
-                URLConnection conn = url.openConnection();
-                InputStream in = new BufferedInputStream(conn.getInputStream());
-                try {
-                    in.read();
-                } finally {
-                    in.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
+//            try {
+//                URL url = new URL("http://www.baidu.com");
+//                URLConnection conn = url.openConnection();
+//                InputStream in = new BufferedInputStream(conn.getInputStream());
+//                try {
+//                    in.read();
+//                } finally {
+//                    in.close();
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+            return "111";
         }
     }
 
@@ -61,5 +61,10 @@ public class TestService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mTest.asBinder();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
     }
 }

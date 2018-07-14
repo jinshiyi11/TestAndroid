@@ -15,7 +15,8 @@ public class MyApplication extends Application {
 
 	public MyApplication() {
 		super();
-	//Debug.waitForDebugger();}
+	//Debug.waitForDebugger();
+    }
 
     public static RefWatcher getRefWatcher() {
         return mRefWatcher;

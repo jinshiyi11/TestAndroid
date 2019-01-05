@@ -8,5 +8,6 @@
     <string name="accessibility_service_description">accessibility_service_description</string>
     <string name="title_activity_test_life_cycle">TestLifeCycleActivity</string>
     <string name="title_activity_test_web_view">TestWebViewActivity</string>
+    <string name="title_activity_test_nested_class">TestNestedClassActivity</string>
 
 </resources>

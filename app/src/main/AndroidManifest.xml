@@ -57,15 +57,18 @@
         <activity android:name=".animation.TestAnimationActivity" />
         <activity android:name=".reflect.TestReflectActivity" />
         <activity android:name=".recyclerview.TestRecyclerViewActivity"></activity>
-        <activity
-            android:name=".webview.TestWebViewActivity"
-            android:label="@string/title_activity_test_web_view"
-            android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".recyclerview.grid.TestRecyclerGridActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".webview.TestWebViewActivity"
+            android:label="@string/title_activity_test_web_view"
+            android:theme="@style/AppTheme.NoActionBar">
+
         </activity>
         <activity
             android:name=".nestedclass.TestNestedClassActivity"

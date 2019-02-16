@@ -51,29 +51,30 @@
             android:exported="true"
             android:process=":test" />
 
-        <activity android:name=".service.TestServiceActivity"></activity>
+        <activity android:name=".service.TestServiceActivity" />
         <activity android:name=".rxjava.TestRxJavaActivity" />
         <activity android:name=".activity.TestScrollViewActivity" />
         <activity android:name=".animation.TestAnimationActivity" />
         <activity android:name=".reflect.TestReflectActivity" />
-        <activity android:name=".recyclerview.TestRecyclerViewActivity"></activity>
+        <activity android:name=".recyclerview.TestRecyclerViewActivity" />
         <activity android:name=".recyclerview.grid.TestRecyclerGridActivity">
+
+        </activity>
+        <activity
+            android:name=".webview.TestWebViewActivity"
+            android:label="@string/title_activity_test_web_view"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".nestedclass.TestNestedClassActivity"
+            android:label="@string/title_activity_test_nested_class"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".textview.TestTextViewActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".webview.TestWebViewActivity"
-            android:label="@string/title_activity_test_web_view"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-        <activity
-            android:name=".nestedclass.TestNestedClassActivity"
-            android:label="@string/title_activity_test_nested_class"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

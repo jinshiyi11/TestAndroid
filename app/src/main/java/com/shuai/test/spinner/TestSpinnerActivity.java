@@ -46,9 +46,9 @@ public class TestSpinnerActivity extends AppCompatActivity {
         //设置下拉样式以后显示的样式
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         int measureSpec = View.MeasureSpec.makeMeasureSpec(0xffff, View.MeasureSpec.AT_MOST);
+        mSpinner.setAdapter(adapter);
         mSpinner.measure(measureSpec,measureSpec);
         mSpinner.setDropDownVerticalOffset(mSpinner.getMeasuredHeight());
-        mSpinner.setAdapter(adapter);
         mSpinner.setSelection(0);
     }
 

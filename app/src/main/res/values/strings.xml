@@ -9,5 +9,6 @@
     <string name="title_activity_test_life_cycle">TestLifeCycleActivity</string>
     <string name="title_activity_test_web_view">TestWebViewActivity</string>
     <string name="title_activity_test_nested_class">TestNestedClassActivity</string>
+    <string name="title_activity_test_spinner">TestSpinnerActivity</string>
 
 </resources>

@@ -1,19 +1,44 @@
 package com.shuai.test.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.PersistableBundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.shuai.test.R;
 
 public class TestLifeCycleActivity extends Activity {
-    private static final String TAG=TestLifeCycleActivity.class.getSimpleName();
+    private Context mContext;
+    private static final String TAG = TestLifeCycleActivity.class.getSimpleName();
+    private Button mBtnStartSecond;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_life_cycle);
+        mContext = this;
+        mBtnStartSecond = (Button) findViewById(R.id.btn_start_second);
+        mBtnStartSecond.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext,SecondActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+    }
+
+    @Override
+    public void finishActivity(int requestCode) {
+        super.finishActivity(requestCode);
     }
 
     @Override
@@ -54,7 +79,7 @@ public class TestLifeCycleActivity extends Activity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("TEST_SAVE","hello");
+        outState.putString("TEST_SAVE", "hello");
         super.onSaveInstanceState(outState);
     }
 
@@ -86,5 +111,10 @@ public class TestLifeCycleActivity extends Activity {
     @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
     }
 }

@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.shuai.test"
-    android:versionCode="1"
-    android:versionName="1.0">
-
-    <uses-sdk
-        android:minSdkVersion="10"
-        android:targetSdkVersion="19" />
+    package="com.shuai.test">
 
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -27,10 +21,20 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".spinner.TestSpinnerActivity"
+            android:label="test_spinner"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".TestBroadcastActivity"
-            android:label="@string/app_name"></activity>
-        <activity android:name=".location.TestLocationActivity"></activity>
-        <activity android:name=".layout.TestLayoutActivity"></activity>
+            android:label="@string/app_name" />
+        <activity android:name=".location.TestLocationActivity" />
+        <activity android:name=".layout.TestLayoutActivity" />
         <activity
             android:name=".touchevent.TestTouchActivity"
             android:label="@string/title_activity_test_touch" />
@@ -57,21 +61,23 @@
             android:exported="true"
             android:process=":test" />
 
-        <activity android:name=".service.TestServiceActivity">
-        </activity>
+        <activity android:name=".service.TestServiceActivity" />
         <activity android:name=".rxjava.TestRxJavaActivity" />
-        <activity android:name=".activity.TestScrollViewActivity"></activity>
+        <activity android:name=".activity.TestScrollViewActivity" />
         <activity android:name=".animation.TestAnimationActivity" />
-        <activity android:name=".reflect.TestReflectActivity"></activity>
-        <activity android:name=".recyclerview.TestRecyclerViewActivity">
-        </activity>
+        <activity android:name=".reflect.TestReflectActivity" />
+        <activity android:name=".recyclerview.TestRecyclerViewActivity" />
+        <activity android:name=".recyclerview.grid.TestRecyclerGridActivity"></activity>
         <activity
-            android:name=".activity.TestLifeCycleActivity"
-            android:label="life">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:name=".webview.TestWebViewActivity"
+            android:label="@string/title_activity_test_web_view"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".nestedclass.TestNestedClassActivity"
+            android:label="@string/title_activity_test_nested_class"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".textview.TestTextViewActivity">
+
         </activity>
         <activity
             android:name=".activity.SecondActivity"

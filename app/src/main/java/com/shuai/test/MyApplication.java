@@ -11,11 +11,18 @@ import com.squareup.leakcanary.RefWatcher;
 
 public class MyApplication extends Application {
     private static final String TAG = MyApplication.class.getSimpleName();
+    private static Context mContext;
     private static RefWatcher mRefWatcher;
+
 
     public MyApplication() {
         super();
+        mContext = this;
         //Debug.waitForDebugger();
+    }
+
+    public static Context getContext(){
+        return mContext;
     }
 
     public static RefWatcher getRefWatcher() {

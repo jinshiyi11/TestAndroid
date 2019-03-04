@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">TestBroadcast</string>
+    <string name="test">测试</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_test_touch">TestTouchActivity</string>

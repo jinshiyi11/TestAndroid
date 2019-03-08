@@ -6,12 +6,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.shuai.test.MyApplication;
 import com.shuai.test.R;
 import com.shuai.test.okhttp.cache.CacheInterceptor;
 
 import java.util.List;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -41,19 +43,24 @@ public class TestOkHttpActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void testRx() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.addInterceptor(new CacheInterceptor());
-        OkHttpClient client = builder.build();
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new CacheInterceptor(MyApplication.getContext(),10*1024*1024))
+                .addInterceptor(logging)
+                .build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .client(client)
-                .baseUrl("https://api.github.com/")
+                //.baseUrl("https://api.github.com/")
+                .baseUrl("http://10.113.21.55")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
 
         RxGitHubService service = retrofit.create(RxGitHubService.class);
-        service.listRepos("octocat")
+        service.test500("tom","123qwe")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<Repo>>() {

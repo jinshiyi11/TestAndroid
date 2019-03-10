@@ -1,6 +1,8 @@
 package com.shuai.test.okhttp.data;
 
 
+import android.text.TextUtils;
+
 import com.shuai.test.okhttp.util.Util;
 
 import java.util.Arrays;
@@ -69,7 +71,7 @@ public class CachePolicy {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (excludeKeys != null) {
-            //sb.append("excludeKeys=" + Arrays.excludeKeys).append(";");
+            sb.append("excludeKeys=" + TextUtils.join(",", excludeKeys)).append(";");
         }
         sb.append("expireTime=" + expireTime).append(";");
         sb.append("useAfterRequest=" + (useAfterRequest ? "1" : "0")).append(";");

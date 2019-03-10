@@ -1,6 +1,7 @@
 package com.shuai.test.okhttp.cache;
 
 import android.content.Context;
+import android.os.SystemClock;
 
 import com.shuai.test.okhttp.data.CachePolicy;
 import com.shuai.test.okhttp.data.Const;
@@ -97,6 +98,10 @@ public class CacheInterceptor implements Interceptor {
                     //不存在缓存，继续透传异常
                     throw e;
                 } else {
+                    //缓存存在，检查有效性
+                    if(!isValid(response,cachePolicy)){
+                        throw e;
+                    }
                     return response;
                 }
             } else {
@@ -133,6 +138,11 @@ public class CacheInterceptor implements Interceptor {
 //                    .build();
 //        }
         return response;
+    }
+
+    private boolean isValid(Response response, CachePolicy cachePolicy) {
+        //TODO:测试，都是用的System.currentTimeMillis()吗？
+        return System.currentTimeMillis()-cachePolicy.getExpireTime()<=cachePolicy.getExpireTime();
     }
 
     private boolean isNetworkUnavailable(Exception e) {

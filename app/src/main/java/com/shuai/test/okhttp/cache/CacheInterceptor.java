@@ -1,6 +1,8 @@
 package com.shuai.test.okhttp.cache;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.SystemClock;
 
 import com.shuai.test.okhttp.data.CachePolicy;
@@ -34,10 +36,22 @@ import retrofit2.adapter.rxjava.HttpException;
 public class CacheInterceptor implements Interceptor {
     private static final String TAG = CacheInterceptor.class.getSimpleName();
     private static final String CACHE_DIR = "network_cache";
+    private Context mAppContext;
     private OfflineCache mCache;
 
     public CacheInterceptor(Context context, long maxSize) {
-        mCache = new OfflineCache(new File(context.getCacheDir() + "/" + CACHE_DIR), maxSize);
+        mAppContext = context.getApplicationContext();
+        mCache = new OfflineCache(new File(context.getCacheDir() + "/" + CACHE_DIR), maxSize, getAppVersion(mAppContext));
+    }
+
+    private static int getAppVersion(Context context){
+        int versionCode = 0;
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            versionCode = packageInfo.versionCode;
+        } catch (Throwable ignored) {
+        }
+        return versionCode;
     }
 
 //    @Override

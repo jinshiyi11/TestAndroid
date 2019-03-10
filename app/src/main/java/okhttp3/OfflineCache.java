@@ -10,8 +10,8 @@ import okhttp3.internal.http.OkHeaders;
 
 //TODO:remove()何时调用？
 public class OfflineCache extends OkHttpCache {
-    public OfflineCache(File directory, long maxSize) {
-        super(directory, maxSize);
+    public OfflineCache(File directory, long maxSize, int appVersion) {
+        super(directory, maxSize,appVersion);
     }
 
     @Override

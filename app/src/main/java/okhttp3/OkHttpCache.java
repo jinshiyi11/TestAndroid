@@ -175,12 +175,12 @@ public class OkHttpCache implements Closeable, Flushable {
     private int hitCount;
     private int requestCount;
 
-    public OkHttpCache(File directory, long maxSize) {
-        this(directory, maxSize, FileSystem.SYSTEM);
+    public OkHttpCache(File directory, long maxSize, int appVersion) {
+        this(directory, maxSize, FileSystem.SYSTEM,appVersion);
     }
 
-    OkHttpCache(File directory, long maxSize, FileSystem fileSystem) {
-        this.cache = DiskLruCache.create(fileSystem, directory, VERSION, ENTRY_COUNT, maxSize);
+    OkHttpCache(File directory, long maxSize, FileSystem fileSystem, int appVersion) {
+        this.cache = DiskLruCache.create(fileSystem, directory, appVersion, ENTRY_COUNT, maxSize);
     }
 
     protected String urlToKey(Request request) {

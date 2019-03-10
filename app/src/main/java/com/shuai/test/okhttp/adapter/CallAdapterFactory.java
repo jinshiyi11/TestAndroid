@@ -1,12 +1,19 @@
 package com.shuai.test.okhttp.adapter;
 
+import com.shuai.test.okhttp.annotation.EnableCache;
+import com.shuai.test.okhttp.data.CachePolicy;
+import com.shuai.test.okhttp.data.Const;
+
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
+import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.HttpException;
@@ -70,7 +77,7 @@ public class CallAdapterFactory extends CallAdapter.Factory {
             return CompletableHelper.createCallAdapter(scheduler);
         }
 
-        CallAdapter<Observable<?>> callAdapter = getCallAdapter(returnType, scheduler, observeOnScheduler);
+        CallAdapter<Observable<?>> callAdapter = getCallAdapter(returnType, scheduler, observeOnScheduler, annotations);
         if (isSingle) {
             // Add Single-converter wrapper from a separate class. This defers classloading such that
             // regular Observable operation can be leveraged without relying on this unstable RxJava API.
@@ -79,7 +86,7 @@ public class CallAdapterFactory extends CallAdapter.Factory {
         return callAdapter;
     }
 
-    private CallAdapter<Observable<?>> getCallAdapter(Type returnType, Scheduler scheduler, Scheduler observeOnScheduler) {
+    private CallAdapter<Observable<?>> getCallAdapter(Type returnType, Scheduler scheduler, Scheduler observeOnScheduler, Annotation[] annotations) {
         Type observableType = getParameterUpperBound(0, (ParameterizedType) returnType);
         Class<?> rawObservableType = getRawType(observableType);
         if (rawObservableType == Response.class) {
@@ -100,7 +107,27 @@ public class CallAdapterFactory extends CallAdapter.Factory {
             return new ResultCallAdapter(responseType, scheduler);
         }
 
-        return new SimpleCallAdapter(observableType, scheduler, observeOnScheduler);
+        CachePolicy cachePolicy = getCachePolicyFromAnnotation(annotations);
+        return new SimpleCallAdapter(observableType, scheduler, observeOnScheduler, cachePolicy);
+    }
+
+    private CachePolicy getCachePolicyFromAnnotation(Annotation[] annotations) {
+        CachePolicy cachePolicy = null;
+        if (annotations != null) {
+            for (Annotation annotation : annotations) {
+                if (annotation instanceof EnableCache) {
+                    EnableCache enableCache = (EnableCache) annotation;
+                    cachePolicy = new CachePolicy();
+                    cachePolicy.setExcludeKeys(enableCache.excludeKeys());
+                    cachePolicy.setOnlyUseCache(enableCache.onlyUseCache());
+                    cachePolicy.setUseBeforeRequest(enableCache.useBeforeRequest());
+                    cachePolicy.setUseAfterRequest(enableCache.useAfterRequest());
+                    cachePolicy.setExpireTime(enableCache.expireTime());
+                    break;
+                }
+            }
+        }
+        return cachePolicy;
     }
 
     static final class CallOnSubscribe<T> implements Observable.OnSubscribe<Response<T>> {
@@ -196,15 +223,63 @@ public class CallAdapterFactory extends CallAdapter.Factory {
         }
     }
 
+    static class CallWrapper<T> implements Call<T>{
+        private Call<T> mOriginalCall;
+        private Request mNewRequest;
+
+        public CallWrapper(Call<T> call, Request newRequest) {
+            this.mOriginalCall = call;
+            this.mNewRequest = newRequest;
+        }
+
+        @Override
+        public Response<T> execute() throws IOException {
+            return mOriginalCall.execute();
+        }
+
+        @Override
+        public void enqueue(Callback<T> callback) {
+            mOriginalCall.enqueue(callback);
+        }
+
+        @Override
+        public boolean isExecuted() {
+            return mOriginalCall.isExecuted();
+        }
+
+        @Override
+        public void cancel() {
+            mOriginalCall.cancel();
+        }
+
+        @Override
+        public boolean isCanceled() {
+            return mOriginalCall.isCanceled();
+        }
+
+        @Override
+        public Call<T> clone() {
+            return mOriginalCall.clone();
+        }
+
+        @Override
+        public Request request() {
+            return mNewRequest;
+        }
+    }
+
     static final class SimpleCallAdapter implements CallAdapter<Observable<?>> {
         private final Type responseType;
         private final Scheduler scheduler;
         private final Scheduler observeOnScheduler;
+        //缓存策略
+        private final CachePolicy cachePolicy;
 
-        SimpleCallAdapter(Type responseType, Scheduler scheduler, Scheduler observeOnScheduler) {
+        SimpleCallAdapter(Type responseType, Scheduler scheduler, Scheduler observeOnScheduler, CachePolicy cachePolicy) {
             this.responseType = responseType;
             this.scheduler = scheduler;
             this.observeOnScheduler = observeOnScheduler;
+            this.cachePolicy = cachePolicy;
         }
 
         @Override
@@ -214,6 +289,11 @@ public class CallAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public <R> Observable<R> adapt(Call<R> call) {
+            if (cachePolicy != null) {
+                Request newRequest = call.request().newBuilder().addHeader(Const.HEAD_CACHE_POLICY, cachePolicy.toString()).build();
+                call = new CallWrapper<>(call, newRequest);
+            }
+
             Observable<R> observable = Observable.create(new CallOnSubscribe<>(call))
                     .lift(OperatorMapResponseToBodyOrError.<R>instance());
             if (scheduler != null) {

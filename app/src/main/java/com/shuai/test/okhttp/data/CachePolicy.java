@@ -3,6 +3,8 @@ package com.shuai.test.okhttp.data;
 
 import com.shuai.test.okhttp.util.Util;
 
+import java.util.Arrays;
+
 public class CachePolicy {
     private static final String TAG = CachePolicy.class.getSimpleName();
     private String[] excludeKeys;
@@ -61,6 +63,19 @@ public class CachePolicy {
 
     public void setOnlyUseCache(boolean onlyUseCache) {
         this.onlyUseCache = onlyUseCache;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (excludeKeys != null) {
+            //sb.append("excludeKeys=" + Arrays.excludeKeys).append(";");
+        }
+        sb.append("expireTime=" + expireTime).append(";");
+        sb.append("useAfterRequest=" + (useAfterRequest ? "1" : "0")).append(";");
+        sb.append("useBeforeRequest=" + (useBeforeRequest ? "1" : "0")).append(";");
+        sb.append("onlyUseCache=" + (onlyUseCache ? "1" : "0")).append(";");
+        return sb.toString();
     }
 
     public static CachePolicy parse(String header) {

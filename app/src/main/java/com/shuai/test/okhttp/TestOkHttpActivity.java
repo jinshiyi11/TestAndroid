@@ -8,6 +8,7 @@ import android.widget.Button;
 
 import com.shuai.test.MyApplication;
 import com.shuai.test.R;
+import com.shuai.test.okhttp.adapter.CallAdapterFactory;
 import com.shuai.test.okhttp.cache.CacheInterceptor;
 
 import java.util.List;
@@ -56,7 +57,7 @@ public class TestOkHttpActivity extends AppCompatActivity implements View.OnClic
                 //.baseUrl("https://api.github.com/")
                 .baseUrl("http://10.113.21.55")
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(CallAdapterFactory.create())
                 .build();
 
         RxGitHubService service = retrofit.create(RxGitHubService.class);

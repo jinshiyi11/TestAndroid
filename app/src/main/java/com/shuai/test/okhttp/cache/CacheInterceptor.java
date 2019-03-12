@@ -44,7 +44,7 @@ public class CacheInterceptor implements Interceptor {
         mCache = new OfflineCache(new File(context.getCacheDir() + "/" + CACHE_DIR), maxSize, getAppVersion(mAppContext));
     }
 
-    private static int getAppVersion(Context context){
+    private static int getAppVersion(Context context) {
         int versionCode = 0;
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -90,13 +90,22 @@ public class CacheInterceptor implements Interceptor {
 //                    .build();
 //        }
 
-        String cachePolicyHeader = request.header(Const.HEAD_CACHE_POLICY);
-        if (cachePolicyHeader == null) {
+//        String cachePolicyHeader = request.header(Const.HEAD_CACHE_POLICY);
+//        if (cachePolicyHeader == null) {
+//            //不使用缓存
+//            return chain.proceed(request);
+//        }
+
+        CachePolicy cachePolicy = null;
+        if (request.tag() instanceof CachePolicy) {
+            cachePolicy = (CachePolicy) request.tag();
+        }
+
+        if (cachePolicy == null) {
             //不使用缓存
             return chain.proceed(request);
         }
 
-        CachePolicy cachePolicy = CachePolicy.parse(cachePolicyHeader);
         request = request.newBuilder().removeHeader(Const.HEAD_CACHE_POLICY).build();
         Response response = null;
         //在发送网络请求之前，取出自定义head数据，并删除这些head
@@ -107,15 +116,11 @@ public class CacheInterceptor implements Interceptor {
             response = chain.proceed(request);
         } catch (Exception e) {
             if (useCacheAfterRequest && isNetworkUnavailable(e)) {
-                response = getCache(cacheKey, request);
+                response = getCache(cacheKey, request, cachePolicy);
                 if (response == null) {
                     //不存在缓存，继续透传异常
                     throw e;
                 } else {
-                    //缓存存在，检查有效性
-                    if(!isValid(response,cachePolicy)){
-                        throw e;
-                    }
                     return response;
                 }
             } else {
@@ -131,7 +136,7 @@ public class CacheInterceptor implements Interceptor {
             }
         } else if (useCacheAfterRequest && isServerException(response)) {
             //服务异常，尝试缓存
-            Response cacheResponse = getCache(cacheKey, request);
+            Response cacheResponse = getCache(cacheKey, request, cachePolicy);
             if (cacheResponse != null) {
                 //存在缓存
                 response = cacheResponse;
@@ -154,9 +159,12 @@ public class CacheInterceptor implements Interceptor {
         return response;
     }
 
-    private boolean isValid(Response response, CachePolicy cachePolicy) {
+    private boolean isValid(Response cacheResponse, CachePolicy cachePolicy) {
+        if (cacheResponse == null) {
+            return false;
+        }
         //TODO:测试，都是用的System.currentTimeMillis()吗？
-        return System.currentTimeMillis()-cachePolicy.getExpireTime()<=cachePolicy.getExpireTime();
+        return System.currentTimeMillis() - cacheResponse.receivedResponseAtMillis() <= cachePolicy.getExpireTime();
     }
 
     private boolean isNetworkUnavailable(Exception e) {
@@ -170,11 +178,14 @@ public class CacheInterceptor implements Interceptor {
                 || Util.isTrue(request.header(Const.USE_CACHE_BEFORE_REQUEST));
     }
 
-    private Response getCache(String cacheKey, Request request) {
+    private Response getCache(String cacheKey, Request request, CachePolicy cachePolicy) {
         Response response = null;
         try {
-            //TODO:缓存有效期
             response = mCache.get(cacheKey, request);
+            //缓存存在，检查有效性
+            if (response != null && !isValid(response, cachePolicy)) {
+                response = null;
+            }
         } catch (Exception e) {
             Util.logE(TAG, e.toString(), e);
         }
@@ -183,7 +194,14 @@ public class CacheInterceptor implements Interceptor {
 
     private void updateCache(String cacheKey, Response response) {
         try {
+//            Response cachedResponse = mCache.get(cacheKey, response.request());
             mCache.put(cacheKey, response);
+            //TODO:要不要update
+//            if (cachedResponse != null) {
+//                mCache.update(cachedResponse, response);
+//            } else {
+//                mCache.put(cacheKey, response);
+//            }
         } catch (Exception e) {
             Util.logE(TAG, e.toString(), e);
         }
@@ -231,7 +249,7 @@ public class CacheInterceptor implements Interceptor {
                     .encodedUsername(url.encodedUsername())
                     .encodedPassword(url.encodedPassword())
                     .host(url.host())
-                    .port(url.port() != HttpUrl.defaultPort(url.scheme()) ? url.port() : -1)
+                    .port(url.port() != -1 ? url.port() : HttpUrl.defaultPort(url.scheme()))
                     .addEncodedPathSegments(url.encodedPath());
 
             //TODO：是否有序
@@ -242,6 +260,10 @@ public class CacheInterceptor implements Interceptor {
                 builder.addQueryParameter(key, value);
             }
             result = builder.toString();
+            Util.logD(TAG, "cacheUrl:" + result);
+
+            result = okhttp3.internal.Util.md5Hex(result);
+            Util.logD(TAG, "cacheKey:" + result);
         } catch (Exception e) {
             Util.logE(TAG, e.getMessage(), e);
         }

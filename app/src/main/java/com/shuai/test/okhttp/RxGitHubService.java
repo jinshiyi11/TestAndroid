@@ -16,7 +16,7 @@ public interface RxGitHubService {
     @GET("users/{user}/repos")
     Observable<List<Repo>> listRepos(@Path("user") String user);
 
-    @EnableCache(useAfterRequest = true, expireTime = 5000)
+    @EnableCache(useAfterRequest = true, expireTime = 5000, excludeKeys = {"token","sign"})
     @GET("test500.txt")
     Observable<List<Repo>> test500(@Query("user") String user, @Query("token") String token);
 }

@@ -26,6 +26,7 @@ import rx.schedulers.Schedulers;
 public class TestOkHttpActivity extends AppCompatActivity implements View.OnClickListener {
     private static String TAG = TestOkHttpActivity.class.getSimpleName();
     private Button mBtnTest;
+    private OkHttpClient mClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,17 @@ public class TestOkHttpActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_test_ok_http);
         mBtnTest = findViewById(R.id.btn_test);
         mBtnTest.setOnClickListener(this);
+
+        initOkHttp();
+    }
+
+    private void initOkHttp(){
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        mClient = new OkHttpClient.Builder()
+                .addInterceptor(new CacheInterceptor(MyApplication.getContext(),10*1024*1024))
+                .addInterceptor(logging)
+                .build();
     }
 
     @Override
@@ -44,18 +56,11 @@ public class TestOkHttpActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void testRx() {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new CacheInterceptor(MyApplication.getContext(),10*1024*1024))
-                .addInterceptor(logging)
-                .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .client(client)
+                .client(mClient)
                 //.baseUrl("https://api.github.com/")
-                .baseUrl("http://10.113.21.55")
+                .baseUrl("http://10.113.21.105")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(CallAdapterFactory.create())
                 .build();

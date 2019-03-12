@@ -5,30 +5,25 @@ import java.io.IOException;
 
 import okhttp3.internal.DiskLruCache;
 import okhttp3.internal.Util;
-import okhttp3.internal.http.CacheRequest;
-import okhttp3.internal.http.OkHeaders;
+import okio.BufferedSink;
+import okio.Okio;
 
 //TODO:remove()何时调用？
 public class OfflineCache extends OkHttpCache {
     public OfflineCache(File directory, long maxSize, int appVersion) {
-        super(directory, maxSize,appVersion);
+        super(directory, maxSize, appVersion);
     }
 
     @Override
     protected String urlToKey(Request request) {
         HttpUrl url = request.url();
-        //url.
+        //TODO:
         return null;
     }
 
-    public CacheRequest put(String cacheKey, Response response) throws IOException {
+    public void put(String cacheKey, Response response) throws IOException {
         if (cacheKey == null) {
-            return null;
-        }
-        String requestMethod = response.request().method();
-
-        if (OkHeaders.hasVaryAll(response)) {
-            return null;
+            return;
         }
 
         OkHttpCache.Entry entry = new OkHttpCache.Entry(response);
@@ -36,13 +31,32 @@ public class OfflineCache extends OkHttpCache {
         try {
             editor = cache.edit(cacheKey);
             if (editor == null) {
-                return null;
+                return;
             }
             entry.writeTo(editor);
-            return new OkHttpCache.CacheRequestImpl(editor);
+            BufferedSink sink = Okio.buffer(editor.newSink(ENTRY_BODY));
+            sink.write(response.body().bytes());
+            sink.close();
+            editor.commit();
         } catch (IOException e) {
             abortQuietly(editor);
-            return null;
+        }
+
+        return;
+    }
+
+    public void update(Response cached, Response network) {
+        OkHttpCache.Entry entry = new OkHttpCache.Entry(network);
+        DiskLruCache.Snapshot snapshot = ((OkHttpCache.CacheResponseBody) cached.body()).snapshot;
+        DiskLruCache.Editor editor = null;
+        try {
+            editor = snapshot.edit(); // Returns null if snapshot is not current.
+            if (editor != null) {
+                entry.writeTo(editor);
+                editor.commit();
+            }
+        } catch (IOException e) {
+            abortQuietly(editor);
         }
     }
 

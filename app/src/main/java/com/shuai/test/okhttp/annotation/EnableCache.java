@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnableCache {
-    String[] excludeKeys() default {"token", "signkey"};
+    String[] excludeKeys() default {};
 
     /**
      * 缓存数据有效期，单位毫秒

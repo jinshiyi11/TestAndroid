@@ -728,8 +728,8 @@ public class OkHttpCache implements Closeable, Flushable {
         }
     }
 
-    private static class CacheResponseBody extends ResponseBody {
-        private final DiskLruCache.Snapshot snapshot;
+    public static class CacheResponseBody extends ResponseBody {
+        public final DiskLruCache.Snapshot snapshot;
         private final BufferedSource bodySource;
         private final String contentType;
         private final String contentLength;

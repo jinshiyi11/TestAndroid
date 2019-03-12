@@ -3,6 +3,7 @@ package com.shuai.test.okhttp.adapter;
 import com.shuai.test.okhttp.annotation.EnableCache;
 import com.shuai.test.okhttp.data.CachePolicy;
 import com.shuai.test.okhttp.data.Const;
+import com.shuai.test.okhttp.util.ReflectUtil;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -141,6 +142,9 @@ public class CallAdapterFactory extends CallAdapter.Factory {
         public void call(final Subscriber<? super Response<T>> subscriber) {
             // Since Call is a one-shot type, clone it for each new subscriber.
             Call<T> call = originalCall.clone();
+            if(originalCall.request().tag() instanceof CachePolicy) {
+                ReflectUtil.setRequestTag(call.request(), (CachePolicy) originalCall.request().tag());
+            }
 
             // Wrap the call in a helper which handles both unsubscription and backpressure.
             RequestArbiter<T> requestArbiter = new RequestArbiter<>(call, subscriber);
@@ -259,7 +263,7 @@ public class CallAdapterFactory extends CallAdapter.Factory {
 
         @Override
         public Call<T> clone() {
-            return mOriginalCall.clone();
+            return new CallWrapper(mOriginalCall.clone(),mNewRequest);
         }
 
         @Override
@@ -290,8 +294,9 @@ public class CallAdapterFactory extends CallAdapter.Factory {
         @Override
         public <R> Observable<R> adapt(Call<R> call) {
             if (cachePolicy != null) {
-                Request newRequest = call.request().newBuilder().addHeader(Const.HEAD_CACHE_POLICY, cachePolicy.toString()).build();
-                call = new CallWrapper<>(call, newRequest);
+                Request request = call.request();//.newBuilder().addHeader(Const.HEAD_CACHE_POLICY, cachePolicy.toString()).build();
+                ReflectUtil.setRequestTag(request,cachePolicy);
+                //call = new CallWrapper<>(call, newRequest);
             }
 
             Observable<R> observable = Observable.create(new CallOnSubscribe<>(call))

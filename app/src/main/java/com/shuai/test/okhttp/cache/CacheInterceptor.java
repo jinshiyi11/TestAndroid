@@ -2,18 +2,12 @@ package com.shuai.test.okhttp.cache;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.SystemClock;
 
-import com.shuai.test.okhttp.data.CachePolicy;
-import com.shuai.test.okhttp.data.Const;
 import com.shuai.test.okhttp.util.Util;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -23,12 +17,10 @@ import java.util.TreeMap;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
-import okhttp3.OfflineCache;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.Buffer;
-import retrofit2.adapter.rxjava.HttpException;
 
 /**
  * 自定义OkHttp缓存Interceptor
@@ -39,6 +31,11 @@ public class CacheInterceptor implements Interceptor {
     private Context mAppContext;
     private OfflineCache mCache;
 
+    /**
+     * 构造函数
+     * @param context context对象
+     * @param maxSize 缓存大小，单位字节
+     */
     public CacheInterceptor(Context context, long maxSize) {
         mAppContext = context.getApplicationContext();
         mCache = new OfflineCache(new File(context.getCacheDir() + "/" + CACHE_DIR), maxSize, getAppVersion(mAppContext));
@@ -54,108 +51,42 @@ public class CacheInterceptor implements Interceptor {
         return versionCode;
     }
 
-//    @Override
-//    public Response intercept(Chain chain) throws IOException {
-//        Request request = chain.request();
-//        Response response = null;
-//        try {
-//            response = doIntercept(chain, request);
-//        } catch (Exception e) {
-//            //缓存出现异常，跳过缓存逻辑
-//            Util.logE(TAG, e.getMessage(), e);
-//        }
-//
-//        if (response == null) {
-//            response = chain.proceed(request);
-//        }
-//
-//        return response;
-//    }
-
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
-        //TODO:网络请求前查询缓存
-//        boolean netAvailable = NetWorkUtil.isNetAvailable(MyApplication.getContext());
-
-//        if (netAvailable) {
-//            request = request.newBuilder()
-//                    //网络可用 强制从网络获取数据
-//                    .cacheControl(CacheControl.FORCE_NETWORK)
-//                    .build();
-//        } else {
-//            request = request.newBuilder()
-//                    //网络不可用 从缓存获取
-//                    .cacheControl(CacheControl.FORCE_CACHE)
-//                    .build();
-//        }
-
-//        String cachePolicyHeader = request.header(Const.HEAD_CACHE_POLICY);
-//        if (cachePolicyHeader == null) {
-//            //不使用缓存
-//            return chain.proceed(request);
-//        }
+        String cachePolicyString = request.url().queryParameter(CacheConst.CACHE_POLICY);
 
         CachePolicy cachePolicy = null;
-        if (request.tag() instanceof CachePolicy) {
-            cachePolicy = (CachePolicy) request.tag();
-        }
-
-        if (cachePolicy == null) {
+        if (cachePolicyString == null || (cachePolicy = CachePolicy.parse(cachePolicyString)) == null) {
             //不使用缓存
             return chain.proceed(request);
         }
 
-        request = request.newBuilder().removeHeader(Const.HEAD_CACHE_POLICY).build();
+        //设置了缓存策略
+        //在发送网络请求之前，取出自定义cache数据，并删除
+        HttpUrl url = request.url().newBuilder().removeAllQueryParameters(CacheConst.CACHE_POLICY).build();
+        request = request.newBuilder().url(url).build();
         Response response = null;
-        //在发送网络请求之前，取出自定义head数据，并删除这些head
-        boolean useCacheAfterRequest = cachePolicy.isUseAfterRequest();
-        boolean needCacheNetworkResponse = cachePolicy.isUseBeforeRequest() || cachePolicy.isUseAfterRequest();
         String cacheKey = getCacheKey(request, cachePolicy);
-        try {
-            response = chain.proceed(request);
-        } catch (Exception e) {
-            if (useCacheAfterRequest && isNetworkUnavailable(e)) {
-                response = getCache(cacheKey, request, cachePolicy);
-                if (response == null) {
-                    //不存在缓存，继续透传异常
-                    throw e;
-                } else {
-                    return response;
-                }
+        //只使用缓存或网络请求前使用缓存
+        if (cachePolicy.isForceCache()) {
+            response = getCache(cacheKey, request, cachePolicy);
+            if (response != null) {
+                Util.d(TAG, "hit cache:" + url.toString());
+                return response;
             } else {
-                //非网络原因或者不需要使用缓存，继续透传异常
-                throw e;
+                Util.d(TAG, "no cache:" + url.toString());
+                throw new NoCacheException();
             }
         }
 
+        //发送网络请求
+        response = chain.proceed(request);
         if (response != null && response.isSuccessful()) {
             //网络请求成功，缓存数据
-            if (needCacheNetworkResponse) {
-                updateCache(cacheKey, response);
-            }
-        } else if (useCacheAfterRequest && isServerException(response)) {
-            //服务异常，尝试缓存
-            Response cacheResponse = getCache(cacheKey, request, cachePolicy);
-            if (cacheResponse != null) {
-                //存在缓存
-                response = cacheResponse;
-            }
+            updateCache(cacheKey, response);
         }
 
-//        if (netAvailable) {
-//            response = response.newBuilder()
-//                    .removeHeader("Pragma")
-//                    // 有网络时 设置缓存超时时间1个小时
-//                    .header("Cache-Control", "public, max-age=" + 60 * 60)
-//                    .build();
-//        } else {
-//            response = response.newBuilder()
-//                    .removeHeader("Pragma")
-//                    // 无网络时，设置超时为1周
-//                    .header("Cache-Control", "public, only-if-cached, max-stale=" + 7 * 24 * 60 * 60)
-//                    .build();
-//        }
         return response;
     }
 
@@ -167,17 +98,6 @@ public class CacheInterceptor implements Interceptor {
         return System.currentTimeMillis() - cacheResponse.receivedResponseAtMillis() <= cachePolicy.getExpireTime();
     }
 
-    private boolean isNetworkUnavailable(Exception e) {
-        return e instanceof HttpException
-                || e instanceof ConnectException
-                || e instanceof SocketTimeoutException;
-    }
-
-    private boolean cacheNetworkResponse(Request request) {
-        return Util.isTrue(request.header(Const.USE_CACHE_AFTER_REQUEST))
-                || Util.isTrue(request.header(Const.USE_CACHE_BEFORE_REQUEST));
-    }
-
     private Response getCache(String cacheKey, Request request, CachePolicy cachePolicy) {
         Response response = null;
         try {
@@ -185,9 +105,10 @@ public class CacheInterceptor implements Interceptor {
             //缓存存在，检查有效性
             if (response != null && !isValid(response, cachePolicy)) {
                 response = null;
+                //TODO:移除过期缓存
             }
         } catch (Exception e) {
-            Util.logE(TAG, e.toString(), e);
+            Util.e(TAG, e.toString(), e);
         }
         return response;
     }
@@ -203,22 +124,14 @@ public class CacheInterceptor implements Interceptor {
 //                mCache.put(cacheKey, response);
 //            }
         } catch (Exception e) {
-            Util.logE(TAG, e.toString(), e);
+            Util.e(TAG, e.toString(), e);
         }
-    }
-
-    private boolean isServerException(Response response) {
-        boolean result = false;
-        if (response != null) {
-            int code = response.code();
-            result = code >= 500 && code < 600;
-        }
-        return result;
     }
 
     private String getCacheKey(Request request, CachePolicy cachePolicy) {
         String result = null;
         try {
+            //有序map
             TreeMap<String, String> sortedMap = new TreeMap<>();
             HttpUrl url = request.url();
             int querySize = url.querySize();
@@ -227,7 +140,6 @@ public class CacheInterceptor implements Interceptor {
             }
 
             if (request.method().equals("POST")) {
-                //TODO：解析测试
                 RequestBody body = request.body();
                 MediaType contentType = body.contentType();
                 //Content-Type: application/x-www-form-urlencoded
@@ -240,6 +152,7 @@ public class CacheInterceptor implements Interceptor {
                     decodeParms(requestBody, sortedMap);
                 } else {
                     //不支持其它类型的解析
+                    Util.d(TAG, "unsupport request,type:" + contentType + ",url:" + url);
                     return null;
                 }
             }
@@ -252,31 +165,30 @@ public class CacheInterceptor implements Interceptor {
                     .port(url.port() != -1 ? url.port() : HttpUrl.defaultPort(url.scheme()))
                     .addEncodedPathSegments(url.encodedPath());
 
-            //TODO：是否有序
             for (Map.Entry<String, String> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
 
                 builder.addQueryParameter(key, value);
             }
-            result = builder.toString();
-            Util.logD(TAG, "cacheUrl:" + result);
-
-            result = okhttp3.internal.Util.md5Hex(result);
-            Util.logD(TAG, "cacheKey:" + result);
+            String cacheUrl = builder.toString();
+            result = CacheUtil.md5Hex(cacheUrl);
+            Util.d(TAG, "cacheUrl:" + cacheUrl + ",cacheKey:" + result);
         } catch (Exception e) {
-            Util.logE(TAG, e.getMessage(), e);
+            Util.e(TAG, "getCacheKey exception:", e);
         }
 
-        Util.logD(TAG, "cacheKey:" + result);
         return result;
     }
 
     /**
-     * Decodes parameters in percent-encoded URI-format ( e.g.
-     * "name=Jack%20Daniels&pass=Single%20Malt" ) and adds them to given Map.
+     * x-www-form-urlencoded类型的POST参数解析
+     *
+     * @param parms 字符串参数
+     * @param map   解析的数据存入该map
+     * @throws UnsupportedEncodingException
      */
-    private void decodeParms(String parms, Map<String, String> p) throws UnsupportedEncodingException {
+    private void decodeParms(String parms, Map<String, String> map) throws UnsupportedEncodingException {
         if (parms == null) {
             return;
         }
@@ -296,11 +208,11 @@ public class CacheInterceptor implements Interceptor {
                 value = "";
             }
 
-            String values = p.get(key);
+            String values = map.get(key);
             if (values == null) {
-                p.put(key, values);
+                map.put(key, value);
             } else {
-                p.put(key, values + value);
+                map.put(key, values + value);
             }
         }
     }

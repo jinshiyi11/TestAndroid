@@ -1,8 +1,7 @@
 package com.shuai.test.okhttp.adapter;
 
-import com.shuai.test.okhttp.annotation.EnableCache;
-import com.shuai.test.okhttp.data.CachePolicy;
-import com.shuai.test.okhttp.data.Const;
+//import com.shuai.test.okhttp.annotation.EnableCache;
+import com.shuai.test.okhttp.cache.CachePolicy;
 import com.shuai.test.okhttp.util.ReflectUtil;
 
 import java.io.IOException;
@@ -114,20 +113,20 @@ public class CallAdapterFactory extends CallAdapter.Factory {
 
     private CachePolicy getCachePolicyFromAnnotation(Annotation[] annotations) {
         CachePolicy cachePolicy = null;
-        if (annotations != null) {
-            for (Annotation annotation : annotations) {
-                if (annotation instanceof EnableCache) {
-                    EnableCache enableCache = (EnableCache) annotation;
-                    cachePolicy = new CachePolicy();
-                    cachePolicy.setExcludeKeys(enableCache.excludeKeys());
-                    cachePolicy.setOnlyUseCache(enableCache.onlyUseCache());
-                    cachePolicy.setUseBeforeRequest(enableCache.useBeforeRequest());
-                    cachePolicy.setUseAfterRequest(enableCache.useAfterRequest());
-                    cachePolicy.setExpireTime(enableCache.expireTime());
-                    break;
-                }
-            }
-        }
+//        if (annotations != null) {
+//            for (Annotation annotation : annotations) {
+//                if (annotation instanceof EnableCache) {
+//                    EnableCache enableCache = (EnableCache) annotation;
+//                    cachePolicy = new CachePolicy();
+//                    cachePolicy.setExcludeKeys(enableCache.excludeKeys());
+//                    cachePolicy.setQueryCache(enableCache.onlyUseCache());
+////                    cachePolicy.setUseBeforeRequest(enableCache.useBeforeRequest());
+////                    cachePolicy.setUseAfterRequest(enableCache.useAfterRequest());
+//                    cachePolicy.setExpireTime(enableCache.expireTime());
+//                    break;
+//                }
+//            }
+//        }
         return cachePolicy;
     }
 

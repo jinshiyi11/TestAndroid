@@ -2,22 +2,22 @@ package com.shuai.test.okhttp.util;
 
 import android.util.Log;
 
-import com.shuai.test.okhttp.data.Const;
+import com.shuai.test.okhttp.cache.CacheConst;
 
 /**
  * @author shuaiweican
  * @date 2019/3/6
  */
 public class Util {
-    public static void logD(String tag, String msg) {
+    public static void d(String tag, String msg) {
         Log.d(tag, msg);
     }
 
-    public static void logE(String tag, String msg) {
+    public static void e(String tag, String msg) {
         Log.e(tag, msg);
     }
 
-    public static void logE(String tag, String msg, Throwable throwable) {
+    public static void e(String tag, String msg, Throwable throwable) {
         Log.e(tag, msg, throwable);
     }
 
@@ -27,7 +27,7 @@ public class Util {
         }
 
         try {
-            return Integer.parseInt(value) == Const.INT_TRUE;
+            return Integer.parseInt(value) == CacheConst.INT_TRUE;
         } catch (Exception ignored) {
         }
         return false;

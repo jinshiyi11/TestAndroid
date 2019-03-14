@@ -5,7 +5,9 @@ import java.io.IOException;
 
 import okhttp3.internal.DiskLruCache;
 import okhttp3.internal.Util;
+import okio.Buffer;
 import okio.BufferedSink;
+import okio.BufferedSource;
 import okio.Okio;
 
 //TODO:remove()何时调用？
@@ -21,7 +23,7 @@ public class OfflineCache extends OkHttpCache {
         return null;
     }
 
-    public void put(String cacheKey, Response response) throws IOException {
+    public void put(String cacheKey, Response response) {
         if (cacheKey == null) {
             return;
         }
@@ -35,14 +37,22 @@ public class OfflineCache extends OkHttpCache {
             }
             entry.writeTo(editor);
             BufferedSink sink = Okio.buffer(editor.newSink(ENTRY_BODY));
-            sink.write(response.body().bytes());
+            sink.write(getResponseBody(response));
             sink.close();
             editor.commit();
-        } catch (IOException e) {
+        } catch (Exception e) {
             abortQuietly(editor);
         }
 
         return;
+    }
+
+    private byte[] getResponseBody(Response response) throws IOException {
+        ResponseBody responseBody = response.body();
+        BufferedSource source = responseBody.source();
+        source.request(Long.MAX_VALUE); // Buffer the entire body.
+        Buffer buffer = source.buffer();
+        return buffer.clone().readByteArray();
     }
 
     public void update(Response cached, Response network) {

@@ -1,11 +1,8 @@
 package com.shuai.test.okhttp.util;
 
-import android.telecom.Call;
-
-import com.shuai.test.okhttp.data.CachePolicy;
+import com.shuai.test.okhttp.cache.CachePolicy;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 import okhttp3.Request;
 
@@ -28,7 +25,7 @@ public class ReflectUtil {
 
                 tagField.set(request, cachePolicy);
             } catch (Exception e) {
-                Util.logE(TAG, e.getMessage(), e);
+                Util.e(TAG, e.getMessage(), e);
             }
         }
 

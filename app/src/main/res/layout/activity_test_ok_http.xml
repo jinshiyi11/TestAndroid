@@ -1,17 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".okhttp.TestOkHttpActivity">
 
     <Button
-        android:id="@+id/btn_test"
-        android:layout_width="100dp"
+        android:id="@+id/btn_force_online"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="@string/test"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="只走网络"/>
 
-</android.support.constraint.ConstraintLayout>
+    <Button
+        android:id="@+id/btn_force_cache"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="只走缓存" />
+
+    <Button
+        android:id="@+id/btn_first_online"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="先网络后缓存" />
+
+    <Button
+        android:id="@+id/btn_first_cache"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="先缓存后网络" />
+
+</LinearLayout>

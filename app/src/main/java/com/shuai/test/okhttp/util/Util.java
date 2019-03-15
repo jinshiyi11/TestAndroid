@@ -21,16 +21,7 @@ public class Util {
         Log.e(tag, msg, throwable);
     }
 
-    public static boolean isTrue(String value) {
-        if (value == null) {
-            return false;
-        }
-
-        try {
-            return Integer.parseInt(value) == CacheConst.INT_TRUE;
-        } catch (Exception ignored) {
-        }
-        return false;
+    public static boolean isDebug() {
+        return true;
     }
-
 }

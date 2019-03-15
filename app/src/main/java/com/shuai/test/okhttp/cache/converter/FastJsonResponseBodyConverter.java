@@ -2,6 +2,7 @@ package com.shuai.test.okhttp.cache.converter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
+import com.shuai.test.okhttp.cache.CacheResult;
 import com.shuai.test.okhttp.cache.NetConstants;
 import com.shuai.test.okhttp.cache.exceptions.ServerException;
 import com.shuai.test.okhttp.cache.exceptions.TransformException;
@@ -9,6 +10,7 @@ import com.shuai.test.okhttp.cache.exceptions.TransformException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import okhttp3.ResponseBody;
@@ -31,6 +33,11 @@ final class FastJsonResponseBodyConverter<T> implements Converter<ResponseBody, 
       this.codeKey  = codeKey;
   }
 
+  private boolean isCacheResultType(Type type){
+    return (type instanceof ParameterizedType)
+            &&((ParameterizedType)type).getRawType() == CacheResult.class;
+  }
+
   @Override
   public T convert(ResponseBody value) throws IOException {
       if (value == null) {
@@ -39,12 +46,22 @@ final class FastJsonResponseBodyConverter<T> implements Converter<ResponseBody, 
       String response = value.string();
       try {
         //无需解析code,直接返回
-        if (NetConstants.NO_CODE.equalsIgnoreCase(codeKey)){
-          if (mType == String.class){
+        if (NetConstants.NO_CODE.equalsIgnoreCase(codeKey)) {
+          if (mType == String.class) {
             return (T) response;
-          }else {
-            return JSON.parseObject(response, mType, FastJsonConfigProvider.getParseConfig(), JSON.DEFAULT_PARSER_FEATURE,
-                    features != null ? features : EMPTY_SERIALIZER_FEATURES);
+          } else {
+            //如果返回类型是CacheResult<Data>，Data才是真正的数据类型
+            if (!isCacheResultType(mType)) {
+              return JSON.parseObject(response, mType, FastJsonConfigProvider.getParseConfig(), JSON.DEFAULT_PARSER_FEATURE,
+                      features != null ? features : EMPTY_SERIALIZER_FEATURES);
+            } else {
+              //拿到CacheResult<Data>的真正的数据类型
+              Type realType = ((ParameterizedType) mType).getActualTypeArguments()[0];
+              Object data = JSON.parseObject(response, realType, FastJsonConfigProvider.getParseConfig(), JSON.DEFAULT_PARSER_FEATURE,
+                      features != null ? features : EMPTY_SERIALIZER_FEATURES);
+              //isFromCache参数始终设为false，由RetrofitProxy去设置来自缓存还是网络，因为判断不了来源
+              return (T) new CacheResult<>(false, data);
+            }
           }
           //需要解析
         }else {
@@ -55,8 +72,18 @@ final class FastJsonResponseBodyConverter<T> implements Converter<ResponseBody, 
             if (mType == String.class){
               return (T) json;
             }else {
-              return JSON.parseObject(json, mType, FastJsonConfigProvider.getParseConfig(), JSON.DEFAULT_PARSER_FEATURE,
-                      features != null ? features : EMPTY_SERIALIZER_FEATURES);
+              //如果返回类型是CacheResult<Data>，Data才是真正的数据类型
+              if (!isCacheResultType(mType)) {
+                return JSON.parseObject(json, mType, FastJsonConfigProvider.getParseConfig(), JSON.DEFAULT_PARSER_FEATURE,
+                        features != null ? features : EMPTY_SERIALIZER_FEATURES);
+              } else {
+                //拿到CacheResult<Data>的真正的数据类型
+                Type realType = ((ParameterizedType) mType).getActualTypeArguments()[0];
+                Object data = JSON.parseObject(response, realType, FastJsonConfigProvider.getParseConfig(), JSON.DEFAULT_PARSER_FEATURE,
+                        features != null ? features : EMPTY_SERIALIZER_FEATURES);
+                //isFromCache参数始终设为false，由RetrofitProxy去设置来自缓存还是网络，因为判断不了来源
+                return (T) new CacheResult<>(false, data);
+              }
             }
           } else {  //业务出错
             String msg = null;

@@ -4,9 +4,6 @@ package com.shuai.test.okhttp.cache;
  * cache常量
  */
 public class CacheConst {
-    public static final int INT_FALSE = 0;
-    public static final int INT_TRUE = 1;
-
     /**
      * 内部使用，用于传递缓存策略信息，在发送网络请求前会删除，放在query参数中
      */
@@ -25,6 +22,6 @@ public class CacheConst {
     /**
      * 查询缓存还是走网络请求
      */
-    public static final String QUERY_CACHE = "queryCache";
+    public static final String CACHE_TYPE = "cacheType";
 
 }

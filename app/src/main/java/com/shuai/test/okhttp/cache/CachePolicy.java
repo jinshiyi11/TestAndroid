@@ -4,59 +4,71 @@ import android.text.TextUtils;
 
 import com.shuai.test.okhttp.util.Util;
 
+
 /**
  * 缓存策略
  */
 public class CachePolicy {
     private static final String TAG = CachePolicy.class.getSimpleName();
+
+    /**
+     * 先请求网络，请求网络失败再查询缓存
+     */
+    public static final int FIRST_ONLINE = 1;
+
+    /**
+     * 先查询缓存，查询缓存失败再请求网络
+     */
+    public static final int FIRST_CACHE = 2;
+
+    /**
+     * 只请求网络，不用缓存
+     */
+    public static final int FORCE_ONLINE = 3;
+
+    /**
+     * 只用缓存，不请求网络
+     */
+    public static final int FORCE_CACHE = 4;
+
+    /**
+     * 缓存策略
+     */
+    private int mType;
+
+    /**
+     * 不参与缓存key计算的参数列表，使用逗号分隔
+     */
     private String[] excludeKeys;
+
+    /**
+     * 缓存过期时间
+     */
     private long expireTime;
-    private boolean forceCache;
-
-    private static final CachePolicy onlinePolicy = new CachePolicy();
-
-    private static final CachePolicy cachePolicy = new CachePolicy(Long.MAX_VALUE);
-
-    public static CachePolicy online() {
-        return onlinePolicy;
-    }
-
-    public static CachePolicy cache() {
-        return cachePolicy;
-    }
-
-    public static CachePolicy cache(long expireTime) {
-        return new CachePolicy(expireTime);
-    }
 
     public CachePolicy forceCache() {
-        return copy().setForceCache(true);
+        return copy().setType(FORCE_CACHE);
     }
 
     public CachePolicy forceOnline() {
-        return copy().setForceCache(false);
+        return copy().setType(FORCE_ONLINE);
     }
 
     private CachePolicy copy() {
         CachePolicy cachePolicy = new CachePolicy();
+        cachePolicy.mType = mType;
         cachePolicy.excludeKeys = excludeKeys;
         cachePolicy.expireTime = expireTime;
-        cachePolicy.forceCache = forceCache;
         return cachePolicy;
     }
 
-    public CachePolicy() {
-
+    private CachePolicy() {
     }
 
-    public CachePolicy(long expireTime) {
-        this(null, expireTime, false);
-    }
-
-    public CachePolicy(String[] excludeKeys, long expireTime, boolean forceCache) {
+    public CachePolicy(int type, String[] excludeKeys, long expireTime) {
+        this.mType = type;
         this.excludeKeys = excludeKeys;
         this.expireTime = expireTime;
-        this.forceCache = forceCache;
     }
 
     public String[] getExcludeKeys() {
@@ -77,23 +89,31 @@ public class CachePolicy {
         return this;
     }
 
-    public boolean isForceCache() {
-        return forceCache;
+    public int getType() {
+        return mType;
     }
 
-    public CachePolicy setForceCache(boolean forceCache) {
-        this.forceCache = forceCache;
+    public CachePolicy setType(int type) {
+        this.mType = type;
         return this;
+    }
+
+    public boolean isForceOnline() {
+        return mType == FORCE_ONLINE;
+    }
+
+    public boolean isForceCache() {
+        return mType == FORCE_CACHE;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(CacheConst.CACHE_POLICY + ";");
         if (excludeKeys != null) {
             sb.append(CacheConst.EXCLUDE_KEYS + "=" + TextUtils.join(",", excludeKeys)).append(";");
         }
         sb.append(CacheConst.EXPIRE_TIME + "=" + expireTime).append(";");
-        sb.append(CacheConst.QUERY_CACHE + "=" + (forceCache ? "1" : "0")).append(";");
+        sb.append(CacheConst.CACHE_TYPE + "=" + mType).append(";");
         return sb.toString();
     }
 
@@ -118,8 +138,8 @@ public class CachePolicy {
                         cachePolicy.setExcludeKeys(value.split(","));
                     } else if (key.equals(CacheConst.EXPIRE_TIME)) {
                         cachePolicy.setExpireTime(Long.parseLong(value));
-                    } else if (key.equals(CacheConst.QUERY_CACHE)) {
-                        cachePolicy.setForceCache(Integer.parseInt(value) == CacheConst.INT_TRUE);
+                    } else if (key.equals(CacheConst.CACHE_TYPE)) {
+                        cachePolicy.setType(Integer.parseInt(value));
                     }
                 } else {
                     continue;

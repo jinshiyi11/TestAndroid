@@ -3,6 +3,7 @@ package com.shuai.test.okhttp.cache;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 
+
 import com.shuai.test.okhttp.util.Util;
 
 import java.io.File;
@@ -72,10 +73,14 @@ public class CacheInterceptor implements Interceptor {
         if (cachePolicy.isForceCache()) {
             response = getCache(cacheKey, request, cachePolicy);
             if (response != null) {
-                Util.d(TAG, "hit cache:" + url.toString());
+                if(Util.isDebug()) {
+                    Util.d(TAG, "hit cache:" + url.toString());
+                }
                 return response;
             } else {
-                Util.d(TAG, "no cache:" + url.toString());
+                if(Util.isDebug()) {
+                    Util.d(TAG, "no cache:" + url.toString());
+                }
                 throw new NoCacheException();
             }
         }
@@ -115,14 +120,11 @@ public class CacheInterceptor implements Interceptor {
 
     private void updateCache(String cacheKey, Response response) {
         try {
-//            Response cachedResponse = mCache.get(cacheKey, response.request());
+            if(Util.isDebug()){
+                Util.d(TAG, "update cache:" + response.request().url().toString());
+            }
+
             mCache.put(cacheKey, response);
-            //TODO:要不要update
-//            if (cachedResponse != null) {
-//                mCache.update(cachedResponse, response);
-//            } else {
-//                mCache.put(cacheKey, response);
-//            }
         } catch (Exception e) {
             Util.e(TAG, e.toString(), e);
         }

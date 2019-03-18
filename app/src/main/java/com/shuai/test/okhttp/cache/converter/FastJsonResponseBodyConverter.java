@@ -79,7 +79,7 @@ final class FastJsonResponseBodyConverter<T> implements Converter<ResponseBody, 
               } else {
                 //拿到CacheResult<Data>的真正的数据类型
                 Type realType = ((ParameterizedType) mType).getActualTypeArguments()[0];
-                Object data = JSON.parseObject(response, realType, FastJsonConfigProvider.getParseConfig(), JSON.DEFAULT_PARSER_FEATURE,
+                Object data = JSON.parseObject(json, realType, FastJsonConfigProvider.getParseConfig(), JSON.DEFAULT_PARSER_FEATURE,
                         features != null ? features : EMPTY_SERIALIZER_FEATURES);
                 //isFromCache参数始终设为false，由RetrofitProxy去设置来自缓存还是网络，因为判断不了来源
                 return (T) new CacheResult<>(false, data);

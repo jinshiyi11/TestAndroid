@@ -50,7 +50,9 @@ public class TestDialogActivity extends Activity {
 		mBtnShowMyDialog.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mMyDialog = new MyDialog(mContext);
+				if(mMyDialog==null) {
+					mMyDialog = new MyDialog(mContext);
+				}
 				mMyDialog.show();
 			}
 		});

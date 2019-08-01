@@ -2,6 +2,7 @@ package com.shuai.test.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.Gravity;
@@ -11,7 +12,7 @@ import android.widget.TextView;
 /**
  *
  */
-public class MyDialog extends Dialog {
+public class MyDialog extends Dialog implements DialogInterface.OnDismissListener {
     private Context mContext;
     private TextView mTvTest;
 
@@ -22,6 +23,7 @@ public class MyDialog extends Dialog {
     public MyDialog(@NonNull Context context, int themeResId) {
         super(context, themeResId);
         mContext = context;
+        setOnDismissListener(this);
     }
 
     @Override
@@ -37,5 +39,11 @@ public class MyDialog extends Dialog {
         WindowManager.LayoutParams attributes = getWindow().getAttributes();
         attributes.gravity= Gravity.BOTTOM;
         getWindow().setAttributes(attributes);
+    }
+
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+
     }
 }

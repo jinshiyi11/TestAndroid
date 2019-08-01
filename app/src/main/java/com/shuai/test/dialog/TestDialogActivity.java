@@ -16,6 +16,8 @@ import com.shuai.test.R;
 public class TestDialogActivity extends Activity {
 	private Context mContext;
 	private Button mBtnShowDialog;
+	private Button mBtnShowMyDialog;
+	private MyDialog mMyDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,15 @@ public class TestDialogActivity extends Activity {
 //				DisplayMetrics metrics = getResources().getDisplayMetrics();
 //				int width = metrics.widthPixels;
 //				dlg.getWindow().setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT);
+			}
+		});
+
+		mBtnShowMyDialog=findViewById(R.id.btn_show_my_dialog);
+		mBtnShowMyDialog.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mMyDialog = new MyDialog(mContext);
+				mMyDialog.show();
 			}
 		});
 		

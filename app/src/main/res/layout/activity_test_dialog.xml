@@ -10,4 +10,10 @@
         android:layout_height="wrap_content"
         android:text="show dialog" />
 
+    <Button
+        android:id="@+id/btn_show_my_dialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="show my dialog" />
+
 </LinearLayout>

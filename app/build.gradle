@@ -51,11 +51,11 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.2.30'
 }
 
-apply plugin: 'com.tencent.matrix-plugin'
-matrix {
-    trace {
-        enable = true
-        baseMethodMapFile = "${project.buildDir}/matrix_output/Debug.methodmap"
-        blackListFile = "${project.projectDir}/matrixTrace/blackMethodList.txt"
-    }
-}
+//apply plugin: 'com.tencent.matrix-plugin'
+//matrix {
+//    trace {
+//        enable = true
+//        baseMethodMapFile = "${project.buildDir}/matrix_output/Debug.methodmap"
+//        blackListFile = "${project.projectDir}/matrixTrace/blackMethodList.txt"
+//    }
+//}

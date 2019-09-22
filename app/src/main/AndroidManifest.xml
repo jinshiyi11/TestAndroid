@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:name=".MyApplication"
@@ -47,6 +48,7 @@
         <activity android:name=".launchmode.LauchModeNormalActivity" />
         <activity android:name=".launchmode.LauchModeSingleTaskActivity" />
 
+        <service android:name="com.lzf.easyfloat.service.FloatService" />
         <service android:name=".tools.TopActivityMonitorService" />
         <service
             android:name=".tools.WindowChangeDetectingService"

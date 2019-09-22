@@ -10,7 +10,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 
+import com.lzf.easyfloat.EasyFloat;
+import com.lzf.easyfloat.enums.ShowPattern;
+import com.lzf.easyfloat.interfaces.OnInvokeView;
+import com.lzf.easyfloat.utils.InputMethodUtils;
 import com.shuai.test.R;
 
 public class TestDialogActivity extends Activity {
@@ -30,10 +35,35 @@ public class TestDialogActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				AlertDialog.Builder builder=new AlertDialog.Builder(mContext);
-				builder.setTitle("1111");
-				builder.setMessage("2222");
-				builder.show();
+
+				EasyFloat.with(TestDialogActivity.this)
+						.setShowPattern(ShowPattern.ALL_TIME)
+						.setTag("fff")
+//						.setDragEnable(false)
+                        .setLayout(R.layout.float_view, new OnInvokeView() {
+							@Override
+							public void invoke(View view) {
+								View rootView = view.getRootView();
+								WindowManager.LayoutParams lp= (WindowManager.LayoutParams) rootView.getLayoutParams();
+								lp.flags=lp.flags&~(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+								rootView.setLayoutParams(lp);
+								final EditText editText=view.findViewById(R.id.et_test);
+								editText.setOnClickListener(new OnClickListener() {
+									@Override
+									public void onClick(View v) {
+										editText.requestFocus();
+										InputMethodUtils.openInputMethod(editText, "fff");
+									}
+								});
+							}
+						})
+                        .show();
+
+
+//				AlertDialog.Builder builder=new AlertDialog.Builder(mContext);
+//				builder.setTitle("1111");
+//				builder.setMessage("2222");
+//				builder.show();
 				
 				//Dialog dlg=new Dialog(mContext);
 				//dlg.setContentView(R.layout.dialog_test);

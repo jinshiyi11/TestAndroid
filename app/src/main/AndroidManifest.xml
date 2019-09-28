@@ -21,6 +21,13 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
+        <activity android:name="com.shuai.test.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".okhttp.TestOkHttpActivity"
             android:label="TestOkHttpActivity">
 
@@ -39,11 +46,6 @@
             android:name=".touchevent.TestTouchActivity"
             android:label="@string/title_activity_test_touch" />
         <activity android:name=".dialog.TestDialogActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".launchmode.LauchModeNormalActivity" />
         <activity android:name=".launchmode.LauchModeSingleTaskActivity" />

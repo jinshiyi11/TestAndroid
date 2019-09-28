@@ -1,5 +1,6 @@
 package com.shuai.test.location;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
@@ -18,6 +20,8 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.CellLocation;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.PhoneStateListener;
@@ -32,12 +36,17 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.shuai.test.R;
+import com.shuai.test.kotlin.Test;
 import com.shuai.test.util.ResourcesUtil;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
+
+@RuntimePermissions
 public class TestLocationActivity extends Activity implements LocationListener {
     private static final String TAG = TestLocationActivity.class.getSimpleName();
 
@@ -55,30 +64,46 @@ public class TestLocationActivity extends Activity implements LocationListener {
     private Geocoder mGeocoder;
 
     private static final long MIN_DISTANCE_FOR_UPDATE = 10;
-    private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 2;
+    private static final long MIN_TIME_FOR_UPDATE = 1000 * 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_location);
-        mContext=this;
-        mLocationManager= (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mContext = this;
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mTelePhonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        mWifiManager= (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        mGeocoder=new Geocoder(this, Locale.getDefault());
-        mPhoneStateListener=new MyPhoneStateListener();
+        mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        mGeocoder = new Geocoder(this, Locale.getDefault());
+        mPhoneStateListener = new MyPhoneStateListener();
 
+        TestLocationActivityPermissionsDispatcher.initWithPermissionCheck(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        TestLocationActivityPermissionsDispatcher.onRequestPermissionsResult(this,requestCode,grantResults);
+    }
+
+    @NeedsPermission({Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.READ_PHONE_STATE
+    })
+    public void init() {
         mTelePhonyManager.listen(mPhoneStateListener,
-                PhoneStateListener.LISTEN_CALL_STATE|
-                        PhoneStateListener.LISTEN_DATA_CONNECTION_STATE|
-                        PhoneStateListener.LISTEN_CELL_INFO|
+                PhoneStateListener.LISTEN_CALL_STATE |
+                        PhoneStateListener.LISTEN_DATA_CONNECTION_STATE |
+                        PhoneStateListener.LISTEN_CELL_INFO |
                         PhoneStateListener.LISTEN_SIGNAL_STRENGTHS
         );
 
-        String test=null;
-        Log.d(TAG,"onCreate"+test);
+        String test = null;
+        Log.d(TAG, "onCreate" + test);
 
-        btnGPSShowLocation = (Button) findViewById(R.id.btnGPSShowLocation);
+        btnGPSShowLocation = findViewById(R.id.btnGPSShowLocation);
         btnGPSShowLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -94,7 +119,7 @@ public class TestLocationActivity extends Activity implements LocationListener {
                                     + "\nLongitude: " + longitude,
                             Toast.LENGTH_LONG).show();
                 } else {
-                    showSettingsAlert("GPS");
+                    //showSettingsAlert("GPS");
                 }
 
             }
@@ -128,7 +153,7 @@ public class TestLocationActivity extends Activity implements LocationListener {
                                     + "\nLongitude: " + longitude,
                             Toast.LENGTH_LONG).show();
                 } else {
-                    showSettingsAlert("NETWORK");
+                    //showSettingsAlert("NETWORK");
                 }
 
             }
@@ -142,22 +167,22 @@ public class TestLocationActivity extends Activity implements LocationListener {
             }
         });
 
-        mBtnGeoCoder= (Button) findViewById(R.id.btn_geocoder);
+        mBtnGeoCoder = (Button) findViewById(R.id.btn_geocoder);
         mBtnGeoCoder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Geocoder.isPresent()){
-                    Log.d(TAG,"Geocoder is present!");
-                }else{
-                    Log.e(TAG,"Geocoder is not present!");
-                    Toast.makeText(mContext,"Geocoder is not present!",Toast.LENGTH_LONG).show();
+                if (Geocoder.isPresent()) {
+                    Log.d(TAG, "Geocoder is present!");
+                } else {
+                    Log.e(TAG, "Geocoder is not present!");
+                    Toast.makeText(mContext, "Geocoder is not present!", Toast.LENGTH_LONG).show();
 
                 }
                 onGeoCoder();
             }
         });
 
-        mBtnScanWifi= (Button) findViewById(R.id.btn_scan_wifi);
+        mBtnScanWifi = (Button) findViewById(R.id.btn_scan_wifi);
         mBtnScanWifi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,42 +190,42 @@ public class TestLocationActivity extends Activity implements LocationListener {
             }
         });
 
-        IntentFilter filter=new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        IntentFilter filter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(!intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
+                if (!intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
                     throw new IllegalStateException();
 
-                Log.d(TAG,"onReceive wifi scan result");
+                Log.d(TAG, "onReceive wifi scan result");
                 List<ScanResult> scanResults = mWifiManager.getScanResults();
-                if(scanResults!=null){
-                    for(ScanResult item:scanResults){
-                        Log.d(TAG,item.toString());
+                if (scanResults != null) {
+                    for (ScanResult item : scanResults) {
+                        Log.d(TAG, item.toString());
                     }
                 }
 
             }
-        },filter);
+        }, filter);
 
 
-        mLocationManager.addNmeaListener(new GpsStatus.NmeaListener() {
-            @Override
-            public void onNmeaReceived(long timestamp, String nmea) {
-                Log.d(TAG,"onNmeaReceived,timestamp:"+timestamp+",nmea:"+nmea);
-
-            }
-        });
+//        mLocationManager.addNmeaListener(new GpsStatus.NmeaListener() {
+//            @Override
+//            public void onNmeaReceived(long timestamp, String nmea) {
+//                Log.d(TAG, "onNmeaReceived,timestamp:" + timestamp + ",nmea:" + nmea);
+//
+//            }
+//        });
 
     }
 
     private void onGeoCoder() {
-        Thread t=new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     List<Address> addressList = mGeocoder.getFromLocationName("天安门", 8);
-                    Log.d(TAG,""+addressList);
+                    Log.d(TAG, "" + addressList);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -217,8 +242,7 @@ public class TestLocationActivity extends Activity implements LocationListener {
 
         alertDialog.setTitle(provider + " SETTINGS");
 
-        alertDialog
-                .setMessage(provider + " is not enabled! Want to go to settings menu?");
+        alertDialog.setMessage(provider + " is not enabled! Want to go to settings menu?");
 
         alertDialog.setPositiveButton("Settings",
                 new DialogInterface.OnClickListener() {
@@ -246,8 +270,12 @@ public class TestLocationActivity extends Activity implements LocationListener {
     }
 
     public Location getLocation(String provider) {
-        Location location=null;
+        Location location = null;
         if (mLocationManager.isProviderEnabled(provider)) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                return null;
+            }
             mLocationManager.requestLocationUpdates(provider,
                     MIN_TIME_FOR_UPDATE, MIN_DISTANCE_FOR_UPDATE, this);
             if (mLocationManager != null) {
@@ -264,12 +292,12 @@ public class TestLocationActivity extends Activity implements LocationListener {
      */
     private void getCellLocationInfo() {
         String operator = mTelePhonyManager.getNetworkOperator();
-        if(!TextUtils.isEmpty(operator)) {
+        if (!TextUtils.isEmpty(operator)) {
             /**通过operator获取 MCC 和MNC */
             int mcc = Integer.parseInt(operator.substring(0, 3));
             int mnc = Integer.parseInt(operator.substring(3));
-        }else{
-            Log.e(TAG,"can not getNetworkOperator");
+        } else {
+            Log.e(TAG, "can not getNetworkOperator");
         }
 
         CellLocation location = mTelePhonyManager.getCellLocation();
@@ -301,13 +329,14 @@ public class TestLocationActivity extends Activity implements LocationListener {
 
     }
 
-    private void onScanWifi(){
+    private void onScanWifi() {
         mWifiManager.startScan();
     }
 
     @Override
     public void onLocationChanged(Location location) {
-
+        Log.d(TAG, "onLocationChanged:" + location);
+        Toast.makeText(this,location.toString(),Toast.LENGTH_SHORT).show();
     }
 
     @Override

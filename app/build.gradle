@@ -51,6 +51,11 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.3.0'
     implementation 'com.alibaba:fastjson:1.2.30'
+    implementation("com.github.hotchemi:permissionsdispatcher:3.3.2") {
+        // if you don't use android.app.Fragment you can exclude support for them
+        exclude module: "support-v13"
+    }
+    annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.3.2"
 }
 
 //apply plugin: 'com.tencent.matrix-plugin'

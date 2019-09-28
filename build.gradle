@@ -23,6 +23,7 @@ allprojects {
             url "https://mvnrepository.com/artifact/commons-io/commons-io"
         }
         maven { url 'https://jitpack.io' }
+        maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
     }
 }
 

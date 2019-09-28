@@ -3,8 +3,15 @@
     android:orientation="vertical" android:layout_width="100dp"
     android:background="#66ffff00"
     android:layout_height="100dp">
+
+    <Button
+        android:id="@+id/btn_scale"
+        android:text="拖动"
+        android:layout_width="60dp"
+        android:layout_height="60dp"/>
     <EditText
         android:id="@+id/et_test"
+        android:hint="123"
         android:layout_width="match_parent"
         android:layout_height="80dp"/>
 

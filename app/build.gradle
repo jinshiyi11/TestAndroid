@@ -24,7 +24,7 @@ android {
 
 
 dependencies {
-    implementation 'com.github.princekin-f:EasyFloat:1.1.0'
+    implementation 'com.github.princekin-f:EasyFloat:1.1.1'
     implementation group: "com.tencent.matrix", name: "matrix-android-lib", version: MATRIX_VERSION, changing: true
     implementation group: "com.tencent.matrix", name: "matrix-android-commons", version: MATRIX_VERSION, changing: true
     implementation group: "com.tencent.matrix", name: "matrix-trace-canary", version: MATRIX_VERSION, changing: true

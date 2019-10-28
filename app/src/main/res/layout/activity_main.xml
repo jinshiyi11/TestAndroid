@@ -5,6 +5,13 @@
     android:orientation="vertical">
 
     <Button
+        android:id="@+id/btn_test_recycler_view"
+        android:textAllCaps="false"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/main_menu_item_height"
+        android:text="RecyclerView" />
+
+    <Button
         android:id="@+id/btn_test_location"
         android:layout_width="match_parent"
         android:layout_height="@dimen/main_menu_item_height"

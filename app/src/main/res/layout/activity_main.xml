@@ -23,4 +23,11 @@
         android:layout_height="@dimen/main_menu_item_height"
         android:text="对话框" />
 
+    <Button
+        android:id="@+id/btn_test_scrolling_activity"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/main_menu_item_height"
+        android:textAllCaps="false"
+        android:text="ScrollingActivity测试" />
+
 </LinearLayout>

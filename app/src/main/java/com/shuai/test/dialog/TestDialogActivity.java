@@ -1,14 +1,11 @@
 package com.shuai.test.dialog;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -19,9 +16,7 @@ import android.widget.EditText;
 import com.lzf.easyfloat.EasyFloat;
 import com.lzf.easyfloat.enums.ShowPattern;
 import com.lzf.easyfloat.interfaces.OnInvokeView;
-import com.lzf.easyfloat.utils.InputMethodUtils;
 import com.shuai.test.R;
-import com.shuai.test.kotlin.Test;
 import com.shuai.test.textview.TestTextViewActivity;
 
 public class TestDialogActivity extends Activity {

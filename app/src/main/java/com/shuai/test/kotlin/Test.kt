@@ -1,7 +1,5 @@
 package com.shuai.test.kotlin
 
-/**
- *
- */
-class Test {
+fun main(args: Array<String>) {
+    println("xxxx")
 }

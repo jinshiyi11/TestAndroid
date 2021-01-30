@@ -13,6 +13,7 @@ class ATest {
 
     @Before
     fun setUp() {
+        val a = A("1231")
     }
 
     @After

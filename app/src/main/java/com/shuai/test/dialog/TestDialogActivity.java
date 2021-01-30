@@ -17,7 +17,6 @@ import com.lzf.easyfloat.EasyFloat;
 import com.lzf.easyfloat.enums.ShowPattern;
 import com.lzf.easyfloat.interfaces.OnInvokeView;
 import com.shuai.test.R;
-import com.shuai.test.textview.TestTextViewActivity;
 
 public class TestDialogActivity extends Activity {
     private Context mContext;
@@ -100,9 +99,6 @@ public class TestDialogActivity extends Activity {
                             mMyDialog = new MyDialog(mContext);
                         }
                         mMyDialog.show();
-
-                        Intent intent = new Intent(TestDialogActivity.this, TestTextViewActivity.class);
-                        startActivity(intent);
                     }
                 });
 

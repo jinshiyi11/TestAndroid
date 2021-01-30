@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,10 +33,9 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import com.shuai.test.util.ResourcesUtil;
 
 import com.shuai.test.R;
-import com.shuai.test.kotlin.Test;
-import com.shuai.test.util.ResourcesUtil;
 
 import java.io.IOException;
 import java.util.List;

@@ -81,7 +81,6 @@
             android:name=".nestedclass.TestNestedClassActivity"
             android:label="@string/title_activity_test_nested_class"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".textview.TestTextViewActivity" />
         <activity
             android:name=".activity.SecondActivity"
             android:label="@string/title_activity_second" />

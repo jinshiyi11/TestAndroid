@@ -316,14 +316,14 @@ public class TestLocationActivity extends Activity implements LocationListener {
 
         int strength = 0;
         /**通过getNeighboringCellInfo获取BSSS */
-        List<NeighboringCellInfo> infoLists = mTelePhonyManager.getNeighboringCellInfo();
-        System.out.println("infoLists:" + infoLists + "     size:" + infoLists.size());
-        for (NeighboringCellInfo info : infoLists) {
-            strength += (-133 + 2 * info.getRssi());// 获取邻区基站信号强度
-            //info.getLac();// 取出当前邻区的LAC
-            //info.getCid();// 取出当前邻区的CID
-            System.out.println("rssi:" + info.getRssi() + "   strength:" + strength);
-        }
+//        List<NeighboringCellInfo> infoLists = mTelePhonyManager.getNeighboringCellInfo();
+//        System.out.println("infoLists:" + infoLists + "     size:" + infoLists.size());
+//        for (NeighboringCellInfo info : infoLists) {
+//            strength += (-133 + 2 * info.getRssi());// 获取邻区基站信号强度
+//            //info.getLac();// 取出当前邻区的LAC
+//            //info.getCid();// 取出当前邻区的CID
+//            System.out.println("rssi:" + info.getRssi() + "   strength:" + strength);
+//        }
 
     }
 

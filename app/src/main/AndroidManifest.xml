@@ -21,11 +21,12 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
+        <activity android:name=".kotlin.TestKotlinActivity"></activity>
         <activity
             android:name=".coordinatorlayout.ScrollingActivity"
             android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".MainActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".MainActivity" />
         <activity
             android:name=".okhttp.TestOkHttpActivity"
             android:label="TestOkHttpActivity" />
@@ -68,8 +69,7 @@
         <activity android:name=".service.TestServiceActivity" />
         <activity android:name=".rxjava.TestRxJavaActivity" />
         <activity android:name=".activity.TestScrollViewActivity" />
-        <activity android:name=".animation.TestAnimationActivity">
-        </activity>
+        <activity android:name=".animation.TestAnimationActivity"></activity>
         <activity android:name=".reflect.TestReflectActivity" />
         <activity android:name=".recyclerview.TestRecyclerViewActivity" />
         <activity android:name=".recyclerview.grid.TestRecyclerGridActivity" />

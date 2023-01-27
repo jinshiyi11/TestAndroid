@@ -71,7 +71,13 @@
         <activity android:name=".activity.TestScrollViewActivity" />
         <activity android:name=".animation.TestAnimationActivity"></activity>
         <activity android:name=".reflect.TestReflectActivity" />
-        <activity android:name=".recyclerview.TestRecyclerViewActivity" />
+        <activity android:name=".recyclerview.TestRecyclerViewActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".recyclerview.grid.TestRecyclerGridActivity" />
         <activity
             android:name=".webview.TestWebViewActivity"
@@ -85,11 +91,7 @@
             android:name=".activity.SecondActivity"
             android:label="@string/title_activity_second" />
         <activity android:name=".statusbar.TestStatusBarActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

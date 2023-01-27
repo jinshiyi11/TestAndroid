@@ -2,7 +2,6 @@ package com.shuai.test.spinner;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -11,13 +10,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.shuai.test.R;
 
-public class DialogSpinner extends android.support.v7.widget.AppCompatButton /*implements android.content.DialogInterface.OnClickListener*/implements
+public class DialogSpinner extends androidx.appcompat.widget.AppCompatButton /*implements android.content.DialogInterface.OnClickListener*/implements
         OnItemClickListener {
     private Dialog mPopup;
     private ListAdapter mAdapter;

@@ -1,6 +1,6 @@
 package com.shuai.test.statusbar
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.shuai.test.R
 

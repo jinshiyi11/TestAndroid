@@ -67,16 +67,18 @@
             android:process=":test" />
 
         <activity android:name=".service.TestServiceActivity" />
-        <activity android:name=".rxjava.TestRxJavaActivity" />
-        <activity android:name=".activity.TestScrollViewActivity" />
-        <activity android:name=".animation.TestAnimationActivity"></activity>
-        <activity android:name=".reflect.TestReflectActivity" />
-        <activity android:name=".recyclerview.TestRecyclerViewActivity" >
+        <activity android:name=".rxjava.TestRxJavaActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".activity.TestScrollViewActivity" />
+        <activity android:name=".animation.TestAnimationActivity"></activity>
+        <activity android:name=".reflect.TestReflectActivity" />
+        <activity android:name=".recyclerview.TestRecyclerViewActivity" >
+
         </activity>
         <activity android:name=".recyclerview.grid.TestRecyclerGridActivity" />
         <activity

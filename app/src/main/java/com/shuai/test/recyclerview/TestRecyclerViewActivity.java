@@ -42,7 +42,7 @@ public class TestRecyclerViewActivity extends Activity implements View.OnClickLi
         recyclerView.setLayoutManager(layoutManager);
         mIvAdd.setOnClickListener(this);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 15; i++) {
             mData.add("Test" + i);
         }// define an adapter
         mAdapter = new MyAdapter(mData);
